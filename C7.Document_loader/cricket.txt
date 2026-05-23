@@ -1,0 +1,20 @@
+🏏 Cricket Basics
+
+Cricket is a bat-and-ball game played between two teams of 11 players each.
+It originated in England and is popular in countries like India, Australia, England, Pakistan, and South Africa.
+
+📋 Formats of the Game:
+1. Test Cricket - 5 Days
+2. One Day International (ODI) - 50 overs
+3. Twenty20 (T20) - 20 overs
+
+🏆 Popular Tournaments:
+- ICC Cricket World Cup
+- ICC T20 World Cup
+- Indian Premier League (IPL)
+- The Ashes
+
+🎯 Basic Rules:
+- One team bats and tries to score runs
+- The other team bowls and fields to restrict runs and dismiss batters
+- After a set number of overs or dismissals, teams switch roles

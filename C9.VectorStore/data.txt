@@ -1,0 +1,136 @@
+# 📘 FAISS (Facebook AI Similarity Search)
+
+FAISS is a **library for efficient similarity search and clustering of dense vectors**. It’s used heavily in machine learning and NLP tasks to enable fast **approximate nearest neighbor (ANN)** search.
+
+---
+
+## 🧠 Why Use FAISS?
+
+When working with embeddings (from text, documents, etc.), you often need to find the **most similar vectors** — like similar documents or semantic matches.
+
+Traditional brute-force search is slow. FAISS allows **fast retrieval** of similar vectors from large datasets.
+
+---
+
+## 🔧 Installation
+
+```bash
+pip install faiss-cpu
+# or
+pip install faiss-gpu  # For GPU support
+```
+
+---
+
+## 🧰 Common FAISS Classes
+
+| Class                   | Description                                                              |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `faiss.IndexFlatL2`     | Basic index using L2 (Euclidean) distance. No compression, exact search. |
+| `faiss.IndexIVFFlat`    | Inverted file index for faster ANN with clustering.                      |
+| `faiss.IndexHNSWFlat`   | Uses Hierarchical Navigable Small World graphs — efficient ANN.          |
+| `faiss.IndexIDMap`      | Adds IDs to index, maps custom IDs to vector positions.                  |
+| `faiss.IndexBinaryFlat` | For binary vector similarity search.                                     |
+
+---
+
+## ✏️ Example 1: Basic Text Embedding Search
+
+```python
+import faiss
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+# Sample documents
+docs = [
+    "Virat Kohli is a cricketer",
+    "Rohit Sharma plays for Mumbai Indians",
+    "MS Dhoni is known as Captain Cool",
+    "Jasprit Bumrah is a fast bowler"
+]
+
+# Convert to embeddings
+model = SentenceTransformer('all-MiniLM-L6-v2')
+embeddings = model.encode(docs)
+
+# Convert to float32 (required by FAISS)
+embeddings = np.array(embeddings).astype('float32')
+
+# Build FAISS index
+index = faiss.IndexFlatL2(embeddings.shape[1])  # dimension = embedding dim
+index.add(embeddings)  # add vectors to index
+
+# Search
+query = model.encode(["Who is a good batsman?"]).astype('float32')
+distances, indices = index.search(query, k=2)  # top 2 matches
+
+print(indices)
+print([docs[i] for i in indices[0]])
+```
+
+---
+
+## ⚙️ Key Methods & Return Types
+
+| Method                             | What it does                                  | Returns                  |
+| ---------------------------------- | --------------------------------------------- | ------------------------ |
+| `index.add(vectors)`               | Adds vectors to the index                     | None                     |
+| `index.search(query, k)`           | Searches for k-nearest neighbors              | (`distances`, `indices`) |
+| `index.ntotal`                     | Number of vectors in the index                | `int`                    |
+| `faiss.normalize_L2()`             | Normalizes vectors to unit length (if needed) | None                     |
+| `faiss.write_index(index, "path")` | Saves index to disk                           | None                     |
+| `faiss.read_index("path")`         | Loads index from disk                         | FAISS index object       |
+
+---
+
+## ✏️ Example 2: Using `IndexIDMap` with Document IDs
+
+```python
+index = faiss.IndexIDMap(faiss.IndexFlatL2(embeddings.shape[1]))
+index.add_with_ids(embeddings, np.array([101, 102, 103, 104]))
+
+query = model.encode(["Who is Captain Cool?"]).astype('float32')
+distances, ids = index.search(query, k=2)
+print(ids)
+```
+
+---
+
+## 📚 When to Use FAISS with Text or Documents?
+
+* **Document similarity search**
+* **QA over document chunks**
+* **Clustering similar responses**
+* **Fast retrieval in RAG pipelines**
+
+---
+
+## 🧪 Combine with LangChain
+
+FAISS can be used with LangChain’s `FAISS` vector store wrapper for storing document chunks with embeddings and retrieving them for QA pipelines.
+
+```python
+from langchain.vectorstores import FAISS
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.docstore.document import Document
+
+# Sample data
+documents = [Document(page_content=text) for text in docs]
+embedding_func = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+vectorstore = FAISS.from_documents(documents, embedding_func)
+retrieved_docs = vectorstore.similarity_search("Tell me about Kohli", k=2)
+
+for d in retrieved_docs:
+    print(d.page_content)
+```
+
+---
+
+## ✅ Summary
+
+* FAISS = Efficient similarity search on vectors (like text/document embeddings)
+* Works with many vector types and sizes
+* Use classes like `IndexFlatL2`, `IndexIDMap`, `IndexIVFFlat`
+* Returns nearest neighbor `indices` and `distances`
+* Combine with LangChain for document retrieval in LLM apps
