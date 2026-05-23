@@ -4,3 +4,13 @@ __pycache__/
 .ipynb_checkpoints/
 venv/
 .env.*
+.env
+*.db
+*.db-wal
+*.db-shm
+*.bin
+*.faiss
+*.pkl
+croma_DB/
+faiss_index/
+__pycache__/
